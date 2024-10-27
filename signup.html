@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link rel="stylesheet"  href="/static/style.css">
+</head>
+<body>
+   
+    <h1>Creat new account!</h1>
+    <input class="lg" placeholder="Username" , id="user"/><br/>
+    <input class="lg" placeholder="Password" , id="pass"/><br/>
+    <input type="submit" value="Sign Up" , id="btn">
+
+</body>
+<script>
+
+    const btn = document.getElementById("btn")
+    btn.addEventListener("click" , ()=>{
+        const xhr = new XMLHttpRequest()
+        xhr.open("POST" , "/users" , true)
+        xhr.setRequestHeader('Content-Type' , 'application/json')
+        xhr.send(JSON.stringify({
+            User: document.getElementById('user').value,
+            Pass: document.getElementById('pass').value
+        }))
+    })
+    
+    
+    </script>
+</html>

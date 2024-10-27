@@ -30,4 +30,16 @@ const Users = sequelize.define('Students' , {
     }
 
 })
-module.exports = {Users , sequelize}
+const Login = sequelize.define('Login' , {
+    Username:{
+        type: Sequelize.STRING,
+        allowNull: false,
+        uniqe: true
+    },
+    Password:{
+        type: Sequelize.STRING,
+        primaryKey: true,
+        allowNull: false
+    }
+})
+module.exports = {Users , sequelize , Login}

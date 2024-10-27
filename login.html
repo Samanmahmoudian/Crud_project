@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<style>
+    div{
+        margin-top: 18%;
+        background-color: rgba(139, 0, 111, 0.9);
+        width: 50%;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        border-radius: 10px;
+        
+    }
+</style>
+<body>
+    <div>
+    
+        <h1>Login</h1>
+        <input type="text" id="user" placeholder="Username" ><br>
+        <input type="text" id="pass" placeholder="Password" ><br>
+        <button id="btn">Login</button>
+        <h6>Dont you have an account?<a href="signup.html">click here!</a></h6>
+    
+</div>
+</body>
+<script>س
+
+
+    const btn = document.getElementById('btn')
+    btn.addEventListener("click" , ()=>{
+        
+        var xhr = new XMLHttpRequest()
+        xhr.open("POST" , "http://localhost:1111/login", true)
+        xhr.setRequestHeader("Content-Type" , 'application/json')
+        xhr.send(JSON.stringify({User:document.getElementById('user').value,
+            Pass: document.getElementById('pass').value
+        }))
+        
+        var xhr = new XMLHttpRequest()
+        xhr.open("GET" , "http://localhost:1111/login", true)
+        xhr.onload = async ()=>{
+             if(xhr.response == 'error'){window.open("Failed.html")}
+             else if(xhr.response == 'EnterData'){alert('Enter Data Please...')}
+             else{window.open('dashboard.html')}
+            
+        }
+        xhr.send()
+
+    })
+    
+</script>
+</html>
