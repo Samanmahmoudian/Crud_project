@@ -24,34 +24,35 @@
         <input type="text" id="user" placeholder="Username" ><br>
         <input type="text" id="pass" placeholder="Password" ><br>
         <button id="btn">Login</button>
-        <h6>Dont you have an account?<a href="signup.html">click here!</a></h6>
+        
     
 </div>
 </body>
-<script>س
+<script>
 
 
     const btn = document.getElementById('btn')
     btn.addEventListener("click" , ()=>{
         
         var xhr = new XMLHttpRequest()
-        xhr.open("POST" , "http://localhost:1111/login", true)
+        xhr.open("POST" , "http://localhost:1111/login_check", true)    
         xhr.setRequestHeader("Content-Type" , 'application/json')
         xhr.send(JSON.stringify({User:document.getElementById('user').value,
             Pass: document.getElementById('pass').value
         }))
-        
-        var xhr = new XMLHttpRequest()
-        xhr.open("GET" , "http://localhost:1111/login", true)
-        xhr.onload = async ()=>{
-             if(xhr.response == 'error'){window.open("Failed.html")}
-             else if(xhr.response == 'EnterData'){alert('Enter Data Please...')}
-             else{window.open('dashboard.html')}
-            
+        var xhr1 = new XMLHttpRequest()
+        xhr1.open('GET' , 'http://localhost:1111/login_status' , true)
+        xhr1.onload = ()=>{
+            if(xhr1.response == 'done'){
+                window.open('./table.html')
+            }
+            else if(xhr1.response == 'failed'){
+                console.log('failed')
+            }
         }
-        xhr.send()
-
+        xhr1.send()
     })
+        
     
 </script>
 </html>

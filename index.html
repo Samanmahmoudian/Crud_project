@@ -47,7 +47,8 @@
 show()
 const div_table = document.getElementById("div_table")
 const add_btn = document.getElementById("add")
-add_btn.addEventListener("click" , ()=>{
+add_btn.addEventListener("click" ,  (e)=>{
+    e.preventDefault();
     if (document.getElementById("fname").value && document.getElementById("lname").value && document.getElementById("si").value &&
     document.getElementById("dob").value && document.getElementById("major").value && document.getElementById("uni").value){
         const xhr = new XMLHttpRequest()
@@ -61,7 +62,7 @@ add_btn.addEventListener("click" , ()=>{
             Major : document.getElementById("major").value,
             University : document.getElementById("uni").value
         }))
-        show()
+         show()
         document.getElementById("fname").value = ''
         document.getElementById("lname").value = ''
         document.getElementById("si").value = ''
@@ -77,7 +78,7 @@ add_btn.addEventListener("click" , ()=>{
 })
 
 
-function show(){
+ function show(){
 const xhr = new XMLHttpRequest()
  xhr.open("GET" , "http://localhost:1111/students" , true)
 const table_extra = document.getElementsByTagName("table")[0]

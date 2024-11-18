@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Table</title>
+    <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+    
+        <h1>Student's Information</h1><br>
+
+        <input type="text" name="fname" id="fname" placeholder="Name" required/><br>
+        
+        <input type="text" name="lname" id="lname" placeholder="Family Name" required/><br>
+        
+        <input type="number" name="si" id="si" placeholder="Student Id" required/><br>
+        
+        <input type="date" name="dob" id="dob" placeholder="Date Of Birth" required/><br>
+        
+        <input type="text" name="major" id="major" placeholder="Major" required/><br>
+        
+        <input type="text" name="uni" id="uni" placeholder="University"  required /><br>
+
+        <input style="display:none;" type="button" name="submit" id="submit" value="submit changes"/><br>
+        
+        <input type="button" name="add" id="add" value="Add" onclick="add()"/><br>
+
+
+        <input type="number" placeholder="Search for student id..." id="srch" />
+        <table id="table">
+            <thead>
+                <tr>
+                    <th>Row</th>
+                    <th>Name</th>
+                    <th>Family</th>
+                    <th>Id</th>
+                    <th>Major</th>
+                    <th>Univercity</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+        </table>
+           
+    
+    
+</body>
+<script>
+
+    let students = []
+    refresh_data()
+    async function refresh_data(){
+        let req = await new Promise(resolve=>{
+            const xhr = new XMLHttpRequest()
+            xhr.open('GET' , 'http://localhost:1111/students')
+            xhr.onload = ()=>{
+                if(xhr.status == 200){
+                    students = Array.from(JSON.parse(xhr.response))
+                    resolve()
+                }
+
+        }
+        xhr.send() 
+        
+        }).then(()=>{
+            tbody.innerHTML = ''
+        for (let i=0 ; i<students.length ; i++){
+            const tbody = document.getElementById('tbody')
+            const tr = document.createElement("tr")
+            tbody.appendChild(tr)
+            let cells = [i+1 , students[i].Name , students[i].Family , students[i].Id 
+            , students[i].Major , students[i].University]
+            for (let j=0 ; j<7 ; j++){
+                const td = document.createElement("td")
+                if(j == 6){
+                    td.appendChild(delete_btn(i))
+                     td.appendChild(update_btn(i)) 
+                }else{
+                    td.textContent = cells[j]
+                }
+                
+                tr.appendChild(td)  
+            }
+        }
+        })
+
+    } 
+    async function add(){
+        return new Promise((resolve)=>{
+            const xhr = new XMLHttpRequest()
+            xhr.open("POST" , "http://localhost:1111/students" ) 
+            xhr.setRequestHeader("Content-Type" , "application/json")
+            xhr.send(JSON.stringify({
+            Name : document.getElementById("fname").value,
+            Family : document.getElementById("lname").value,
+            Id : document.getElementById("si").value,
+            Date_of_birth : document.getElementById("dob").value,
+            Major : document.getElementById("major").value,
+            University : document.getElementById("uni").value
+            }))
+            resolve()
+        }).then(()=>{
+            refresh_data()
+        })
+        
+    }
+    function delete_btn(i){
+        const btn = document.createElement("input")
+        btn.type = "button"
+        btn.id = 'del_btn'
+        btn.dataset.index = i
+        btn.addEventListener("click" , async ()=>{
+            const tbody = document.getElementById('tbody')
+            const rowindex = btn.dataset.index
+            const tr = tbody.getElementsByTagName("tr")[rowindex]
+            const td_id = Number(tr.getElementsByTagName("td")[3].textContent)
+            return new Promise(resolve=>{
+                const xhr = new XMLHttpRequest()
+                xhr.open("DELETE" , `http://localhost:1111/students/${td_id}`)
+                xhr.onload = ()=>{
+                if(xhr.status == 200){
+                    if(xhr.responseText == 'done'){
+                        resolve()
+                }
+                }
+            }
+            xhr.send()
+            }).then(()=>{
+                refresh_data()
+            })
+        })
+        return btn
+    }
+function update_btn(i){
+    const btn = document.createElement("input")
+    btn.type = "button"
+    btn.id = 'update_btn'
+    btn.dataset.index = i
+    btn.addEventListener("click" , async ()=>{
+        const tbody = document.getElementById('tbody')
+        const rowindex = btn.dataset.index
+        const tr = tbody.getElementsByTagName("tr")[rowindex]
+        const td_id = Number(tr.getElementsByTagName("td")[3].textContent)
+        let req = new Promise(resolve=>{
+            const xhr = new XMLHttpRequest()
+            xhr.open('GET' , `http://localhost:1111/students/${td_id}`)
+            xhr.onload = async ()=>{
+                student = await JSON.parse(xhr.response)
+                resolve(student)
+            }
+            xhr.send()
+            
+        }).then(student=>{
+            document.getElementById("fname").value = student.Name
+            document.getElementById("lname").value = student.Family
+            document.getElementById("si").value = student.Id
+            document.getElementById("dob").value = student.Date_of_birth
+            document.getElementById("major").value = student.Major
+            document.getElementById("uni").value = student.University
+        }).then(()=>{
+            const btn1 = document.getElementById("submit")
+            btn1.style.display = ''
+            btn1.onclick = submit
+            const btn2 = document.getElementById('add') 
+            btn2.style.display = 'none'
+            
+        })
+        
+    })
+    return btn
+}
+function submit(){
+    if (document.getElementById("fname").value && document.getElementById("lname").value && document.getElementById("si").value &&
+    document.getElementById("dob").value && document.getElementById("major").value && document.getElementById("uni").value){
+       let req = new Promise(resolve=>{
+            const xhr = new XMLHttpRequest()
+            xhr.open("PUT" , `http://localhost:1111/students/${document.getElementById('si').value}`)
+            xhr.setRequestHeader("Content-Type" , "application/json")
+            xhr.send(JSON.stringify({                       
+            Name : document.getElementById("fname").value,
+            Family : document.getElementById("lname").value,
+            Id : document.getElementById("si").value,
+            Date_of_birth : document.getElementById("dob").value,
+            Major : document.getElementById("major").value,
+            University : document.getElementById("uni").value
+            }))
+            xhr.onload = ()=>{
+                if(xhr.status == 200){
+                    if(xhr.response == 'done'){
+                        resolve()
+                        refresh_data()
+                    }
+                    
+                }
+            }
+            
+       }).then(()=>{
+            const btn = document.getElementById("submit")
+            btn.style.display = "none"
+            const add = document.getElementById("add")
+            add.style.display = ''
+            document.getElementById("fname").value = ''
+            document.getElementById("lname").value = ''
+            document.getElementById("si").value = ''
+            document.getElementById("dob").value = ''
+            document.getElementById("major").value = ''
+            document.getElementById("uni").value = ''
+
+       })
+    }else{
+        alert("Please Enter Whole Data's ...")
+    }
+}
+const srch_inpt = document.getElementById("srch")
+srch_inpt.addEventListener("input" , ()=>{
+const srch_id = document.getElementById("srch").value
+const table = document.getElementsByTagName("table")[0]
+const tr = table.getElementsByTagName("tr")
+
+for (let i=1; i<tr.length; i++){
+    if (srch_id){ 
+        const td = tr[i].getElementsByTagName("td")[3].textContent
+        if (td.indexOf(srch_id) == 0){
+        tr[i].style.display = ""
+        }
+        else{
+            tr[i].style.display = "none"
+        }}
+    else{
+        refresh_data()
+    }
+}
+
+
+
+
+})
+
+</script>
+</html>
