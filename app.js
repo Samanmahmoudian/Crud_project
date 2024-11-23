@@ -1,10 +1,9 @@
 const express = require("express")
 const Sequelize = require('sequelize')
+const {where} = require('sequelize')
 const cors = require("cors") 
-const app = express() 
-const path = require("path")
-const { promiseHooks } = require("v8")
 const port = 1111
+const app = express() 
 app.use(express.json()) 
 app.use(express.urlencoded())
 app.use(cors())
@@ -19,17 +18,54 @@ const sequelize = new Sequelize('crud' , 'postgres' , 'Saman1384' , {
     underscored: true
 })
 
-let students = null
-let users = {User: 'saman' , Pass:'1234'}
-let login_state = false
+const users_table = sequelize.define('users' , {
+    Username:{ 
+        type: Sequelize.STRING,
+        allowNull: false,
+        unique: true
+    },
+    Password:{
+        type: Sequelize.INTEGER,
+        allowNull: false,
+        primaryKey: true
+    }
+})
+users_table.sync().then(()=>{
+    console.log('Users loaded sucessfuly')
+})
+function create_user(user){
+    users_table.create({Username: user.User , Password: user.Pass}).then(()=>{
+        console.log('User added sunccesfuly')
+    }).catch(()=>{
+        console.log('User added failed')
+    })
+}
 
-let pr = new Promise((resolve,reject)=>{
-    app.post('/login_check' , (req,res)=>{
-        if (req.body.User == users.User && req.body.Pass == users.Pass){
-            login_state = req.body.User
-            app.get('/login_status' , (req,res)=>{
+app.post('/signup' , async (req , res)=>{
+    if(req.body.User && req.body.Pass){
+        let x = new Promise(resolve=>{
+            create_user(req.body)
+            resolve()
+        }).then(()=>{
+            app.get('/signup' , (req,res)=>{
                 res.send('done')
             })
+        })
+    }
+})
+
+let students = null
+
+let login_state = false
+
+let pr = new Promise((resolve)=>{
+    app.post('/login_check' , (req,res)=>{
+        
+        if (users_table.findOne({where : {
+            Username: req.body.User , Password: req.body.Pass
+        }})){
+            login_state = req.body.User
+
             const table = sequelize.define(`${login_state}_tables`, {
                 Name:{
                     type: Sequelize.STRING,
@@ -58,17 +94,15 @@ let pr = new Promise((resolve,reject)=>{
                 }
                 
             })
+            app.get('/login_check' , (req,res)=>{
+                res.send('done')
+            })
             
             table.sync().then(()=>{
                 console.log('Database connected succesfuly')}).catch(err=>{
                     console.log('Failed to connect to database')
                 })
             resolve(table)
-        }else{
-            app.get('/login_status' , (req,res)=>{
-                res.send('failed')
-            })
-            reject()
         }
     })
 }).then(async (table)=>{

@@ -7,52 +7,94 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <style>
-    div{
+    #parent{
+        display: flex;
+    }
+    #login{
         margin-top: 18%;
-        background-color: rgba(139, 0, 111, 0.9);
-        width: 50%;
+        background-color: rgba(102, 139, 0, 0.9);
+        width: 48%;
         padding-top: 10px;
         padding-bottom: 10px;
         border-radius: 10px;
         
     }
+    #signup{
+        margin-top: 18%;
+        background-color: rgba(102, 139, 0, 0.9);
+        width: 48%;
+        padding-top: 10px;
+        padding-bottom: 10px;
+        border-radius: 10px;
+    }
 </style>
 <body>
-    <div>
+    <div id="parent">
+    <div id="login">
     
-        <h1>Login</h1>
-        <input type="text" id="user" placeholder="Username" ><br>
-        <input type="text" id="pass" placeholder="Password" ><br>
-        <button id="btn">Login</button>
+        <h1 id="h">Login_l</h1>
+        <input type="text" id="user_l" placeholder="Username" ><br>
+        <input type="text" id="pass_l" placeholder="Password" ><br>
+        <button id="btn_l" onclick="btn_l_click()">Submit</button>
+        
         
     
+</div>
+<div id="signup">
+    <h1 id="h_s">Sign up</h1>
+    <input type="text" id="user_s" placeholder="Username" ><br>
+    <input type="text" id="pass_s" placeholder="Password" ><br>
+    <button id="btn_s" onclick="btn_s_click()">Submit</button>
+</div>
 </div>
 </body>
 <script>
 
 
-    const btn = document.getElementById('btn')
-    btn.addEventListener("click" , ()=>{
-        
-        var xhr = new XMLHttpRequest()
+    function btn_l_click(){
+        const xhr = new XMLHttpRequest()
         xhr.open("POST" , "http://localhost:1111/login_check", true)    
         xhr.setRequestHeader("Content-Type" , 'application/json')
-        xhr.send(JSON.stringify({User:document.getElementById('user').value,
-            Pass: document.getElementById('pass').value
+        xhr.send(JSON.stringify({User:document.getElementById('user_l').value,
+            Pass: document.getElementById('pass_l').value
         }))
         var xhr1 = new XMLHttpRequest()
-        xhr1.open('GET' , 'http://localhost:1111/login_status' , true)
+        xhr1.open('GET' , 'http://localhost:1111/login_check' , true)
         xhr1.onload = ()=>{
             if(xhr1.response == 'done'){
-                window.open('./table.html')
+                document.getElementById('user_l').value = ''
+                document.getElementById('pass_l').value = ''
+                window.location.href = './table.html' 
             }
-            else if(xhr1.response == 'failed'){
-                console.log('failed')
-            }
+
         }
         xhr1.send()
-    })
+    }
+    
+    function btn_s_click(){
+        const xhr = new XMLHttpRequest()
+        xhr.open('POST' , 'http://localhost:1111/signup')
+        xhr.setRequestHeader('Content-Type' , 'application/json')
+        xhr.send(JSON.stringify({User:document.getElementById('user_s').value,
+            Pass: document.getElementById('pass_s').value
+        }))
+        const xhr1 = new XMLHttpRequest()
+        xhr1.open('GET' , 'http://localhost:1111/signup' , true)
+        xhr1.onload = ()=>{
+                if(xhr1.response == 'done'){
+                    alert('done')
+                    document.getElementById('user_s').value = ''
+                    document.getElementById('pass_s').value = ''
+                }
+            
+        }
+        xhr1.send()
+
         
+    }
+    
+        
+
     
 </script>
 </html>
