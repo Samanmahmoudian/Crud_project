@@ -32,7 +32,7 @@
     <div id="parent">
     <div id="login">
     
-        <h1 id="h">Login_l</h1>
+        <h1 id="h">Login</h1>
         <input type="text" id="user_l" placeholder="Username" ><br>
         <input type="text" id="pass_l" placeholder="Password" ><br>
         <button id="btn_l" onclick="btn_l_click()">Submit</button>
@@ -51,47 +51,41 @@
 <script>
 
 
-    function btn_l_click(){
-        const xhr = new XMLHttpRequest()
-        xhr.open("POST" , "http://localhost:1111/login_check", true)    
-        xhr.setRequestHeader("Content-Type" , 'application/json')
-        xhr.send(JSON.stringify({User:document.getElementById('user_l').value,
-            Pass: document.getElementById('pass_l').value
-        }))
-        var xhr1 = new XMLHttpRequest()
-        xhr1.open('GET' , 'http://localhost:1111/login_check' , true)
-        xhr1.onload = ()=>{
-            if(xhr1.response == 'done'){
-                document.getElementById('user_l').value = ''
-                document.getElementById('pass_l').value = ''
-                window.location.href = './table.html' 
-            }
-
+function btn_l_click(){
+    const xhr = new XMLHttpRequest()
+    xhr.open("POST" , "http://localhost:1111/login_check", true)    
+    xhr.setRequestHeader("Content-Type" , 'application/json')
+    xhr.send(JSON.stringify({User:document.getElementById('user_l').value,
+        Pass: document.getElementById('pass_l').value
+    }))
+    xhr.onload = ()=>{
+        if(xhr.response == 'done'){
+            document.getElementById('user_l').value = ''
+            document.getElementById('pass_l').value = ''
+            window.open('./table.html')
+        }else if(xhr.response == 'failed'){
+            alert('Failed to login')
         }
-        xhr1.send()
     }
+}
     
-    function btn_s_click(){
-        const xhr = new XMLHttpRequest()
-        xhr.open('POST' , 'http://localhost:1111/signup')
-        xhr.setRequestHeader('Content-Type' , 'application/json')
-        xhr.send(JSON.stringify({User:document.getElementById('user_s').value,
-            Pass: document.getElementById('pass_s').value
-        }))
-        const xhr1 = new XMLHttpRequest()
-        xhr1.open('GET' , 'http://localhost:1111/signup' , true)
-        xhr1.onload = ()=>{
-                if(xhr1.response == 'done'){
-                    alert('done')
-                    document.getElementById('user_s').value = ''
-                    document.getElementById('pass_s').value = ''
-                }
-            
-        }
-        xhr1.send()
-
-        
-    }
+function btn_s_click(){
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST' , 'http://localhost:1111/signup')
+    xhr.setRequestHeader('Content-Type' , 'application/json')
+    xhr.send(JSON.stringify({User:document.getElementById('user_s').value,
+        Pass: document.getElementById('pass_s').value
+    }))
+    xhr.onload = ()=>{
+        if(xhr.response == 'done'){
+            alert('Added succesfuly')
+            document.getElementById('user_s').value = ''
+            document.getElementById('pass_s').value = ''
+        }else{
+                alert('failed')
+            }
+        }   
+}
     
         
 

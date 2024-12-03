@@ -54,13 +54,10 @@
         let req = await new Promise(resolve=>{
             const xhr = new XMLHttpRequest()
             xhr.open('GET' , 'http://localhost:1111/students')
-            xhr.onload = ()=>{
-                if(xhr.status == 200){
-                    students = Array.from(JSON.parse(xhr.response))
-                    resolve()
+            xhr.onload = async ()=>{
+                students = await Array.from(JSON.parse(xhr.response))
+                resolve()
                 }
-
-        }
         xhr.send() 
         
         }).then(()=>{
@@ -87,23 +84,29 @@
 
     } 
     async function add(){
-        return new Promise((resolve)=>{
-            const xhr = new XMLHttpRequest()
-            xhr.open("POST" , "http://localhost:1111/students" ) 
-            xhr.setRequestHeader("Content-Type" , "application/json")
-            xhr.send(JSON.stringify({
-            Name : document.getElementById("fname").value,
-            Family : document.getElementById("lname").value,
-            Id : document.getElementById("si").value,
-            Date_of_birth : document.getElementById("dob").value,
-            Major : document.getElementById("major").value,
-            University : document.getElementById("uni").value
-            }))
-            resolve()
-        }).then(()=>{
-            refresh_data()
-        })
-        
+        const xhr = await new XMLHttpRequest()
+        await xhr.open("POST" , "http://localhost:1111/students" ) 
+        await xhr.setRequestHeader("Content-Type" , "application/json")
+        await xhr.send(JSON.stringify({
+        Name : document.getElementById("fname").value,
+        Family : document.getElementById("lname").value,
+        Id : document.getElementById("si").value,
+        Date_of_birth : document.getElementById("dob").value,
+        Major : document.getElementById("major").value,
+        University : document.getElementById("uni").value
+        }))
+        xhr.onload = async ()=>{
+            if(xhr.response == 'done'){
+                alert('added succesfuly')
+                refresh_data()
+                document.getElementById("fname").value = ''
+                document.getElementById("lname").value = ''
+                document.getElementById("si").value = ''
+                document.getElementById("dob").value = ''
+                document.getElementById("major").value = ''
+                document.getElementById("uni").value = ''
+            }
+        }
     }
     function delete_btn(i){
         const btn = document.createElement("input")
@@ -119,15 +122,19 @@
                 const xhr = new XMLHttpRequest()
                 xhr.open("DELETE" , `http://localhost:1111/students/${td_id}`)
                 xhr.onload = ()=>{
-                if(xhr.status == 200){
                     if(xhr.responseText == 'done'){
                         resolve()
+                    }
                 }
-                }
-            }
             xhr.send()
             }).then(()=>{
                 refresh_data()
+                document.getElementById("fname").value = ''
+                document.getElementById("lname").value = ''
+                document.getElementById("si").value = ''
+                document.getElementById("dob").value = ''
+                document.getElementById("major").value = ''
+                document.getElementById("uni").value = ''
             })
         })
         return btn
@@ -148,7 +155,7 @@ function update_btn(i){
             xhr.onload = async ()=>{
                 student = await JSON.parse(xhr.response)
                 resolve(student)
-            }
+                }
             xhr.send()
             
         }).then(student=>{
@@ -186,12 +193,9 @@ function submit(){
             University : document.getElementById("uni").value
             }))
             xhr.onload = ()=>{
-                if(xhr.status == 200){
-                    if(xhr.response == 'done'){
-                        resolve()
-                        refresh_data()
-                    }
-                    
+                if(xhr.response == 'done'){
+                    resolve()
+                    refresh_data()
                 }
             }
             
