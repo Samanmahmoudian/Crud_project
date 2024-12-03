@@ -1,7 +1,6 @@
 const express = require("express")
 const {users_table , DB_check_user , DB_create_user , DB_users_datas} = require('./DB_users')
 const {students_table, DB_students_data , DB_students_add , DB_students_update , DB_students_delete} = require('./DB_students')
-const {test} = require('./test_DB')
 const cors = require("cors") 
 const port = 1111
 const app = express() 
@@ -32,8 +31,9 @@ app.post('/login_check' , async(req,res)=>{
     if(user){
         owner_id = await user.Id
         await reload_data()
+        run_table() 
         res.send('done')
-        await run_table() 
+        
     }else{
         res.send('failed')
     }
